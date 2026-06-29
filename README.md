@@ -1,118 +1,79 @@
-# Stellar Notes DApp
+# organ_pledge
 
-**Stellar Notes DApp** - Blockchain-Based Decentralized Note-Taking System
+## Project Title
+organ_pledge
 
 ## Project Description
-
-Stellar Notes DApp is a decentralized smart contract solution built on the Stellar blockchain using Soroban SDK. It provides a secure, immutable platform for managing personal notes directly on the blockchain. The contract ensures that your data is stored transparently and is only manageable through predefined smart contract functions, eliminating reliance on centralized database providers.
-
-The system allows users to create, view, and delete notes, leveraging the efficiency and security of the Stellar network. Each note is uniquely identified and stored within the contract's instance storage, ensuring data persistence and reliability.
+organ_pledge is a Soroban smart contract that lets any user record a voluntary
+organ donation pledge on the Stellar blockchain, witnessed by a second party,
+and revoke that pledge at any time with a reason. Today, organ donor registries
+are scattered across hospitals, paper cards, and driver-license databases that
+do not talk to each other, and donors have no portable, tamper-proof way to
+prove their wishes. By anchoring pledges on-chain, organ_pledge gives pledgers
+self-sovereign control over their decision and gives hospitals a single,
+auditable registry to consult in critical moments.
 
 ## Project Vision
-
-Our vision is to revolutionize personal productivity in the digital age by:
-
-- **Decentralizing Data**: Moving note-taking from centralized servers to a global, distributed blockchain
-- **Ensuring Ownership**: Empowering users to have complete control and ownership over their digital thoughts and information
-- **Guaranteeing Immutability**: Providing a permanent, tamper-proof record of notes that cannot be altered or deleted by third parties
-- **Enhancing Privacy**: Leveraging blockchain security to protect personal information from unauthorized access
-- **Building Trustless Systems**: Creating a platform where data integrity is guaranteed by code, not by company promises
-
-We envision a future where digital information is truly personal and sovereign, empowering individuals with complete autonomy over their digital assets.
+Our long-term vision is a globally accessible, donor-controlled organ
+pledge registry that any hospital, clinic, or transplant coordinator can
+verify in seconds, regardless of the donor's country of residence. We want
+organ donation intent to be as portable and trustworthy as a digital identity,
+removing friction for grieving families and accelerating the matching of
+donors to recipients. organ_pledge is the first building block: a minimal,
+honest on-chain registry that respects the donor's autonomy and is auditable
+by anyone.
 
 ## Key Features
+- **Self-sovereign pledges**: A pledger signs their own pledge on-chain via
+  `require_auth`, so only they can create or revoke a record under their
+  address.
+- **Witnessed consent**: Every pledge must include a witness address, and the
+  witness must also sign the transaction, mirroring the two-party consent
+  pattern used in real donation paperwork.
+- **Multi-organ support**: The `make_pledge` function accepts a list of
+  organ symbols (e.g. `Kidney`, `Liver`, `Cornea`, `Heart`), so one pledge can
+  cover multiple organs.
+- **Revocable at any time**: The pledger can call `revoke_pledge` with a
+  reason symbol (`medical`, `personal`, `family`, ...) to deactivate the
+  record. Revocation does not delete history; it flips an `active` flag and
+  stores the reason.
+- **Public, read-only registry**: Hospitals and coordinators can call
+  `is_active` and `get_pledge` to query any pledger's status without needing
+  any special authorization.
+- **No funds at risk**: The contract never moves XLM or any token. It is
+  purely a data registry, so a deployment cannot lose user funds even if
+  the contract is exploited.
 
-### 1. **Simple Note Creation**
+## Contract
 
-- Create notes with just one function call
-- Specify title and content for each note
-- Automated ID generation for unique identification
-- Persistent storage on the Stellar blockchain
-
-### 2. **Efficient Data Retrieval**
-
-- Fetch all stored notes in a single call
-- Structured data representation for easy frontend integration
-- Quick access to your entire note collection
-- Real-time synchronization with the blockchain state
-
-### 3. **Secure Deletion**
-
-- Remove specific notes using their unique IDs
-- Permanent removal from the contract storage
-- Clean and efficient storage management
-- Immediate update of the note list after deletion
-
-### 4. **Transparency and Security**
-
-- View all note activities on the blockchain
-- Blockchain-based verification of all storage actions
-- Immutable records of note creation and deletion
-- Protected against unauthorized modifications
-
-### 5. **Stellar Network Integration**
-
-- Leverages the high speed and low cost of Stellar
-- Built using the modern Soroban Smart Contract SDK
-- Scalable architecture for growing note collections
-- Interoperable with other Stellar-based services
-
-## Contract Details
-
-- Contract Address: CBLU4IUASQ4WUMOXBFLZRSBBLILGOH33GS4LUPKFBCCCMJCDQNMF7G2M
-  (Screenshot has been removed)
+- **Network:** Stellar Testnet (Public)
+- **Scope:** healthcare dApp — see `contracts/organ_pledge/src/lib.rs` for the full organ_pledge business logic.
+- **Functions exposed:** see `Key Features` above and the `pub fn` list in `lib.rs`.
+- **Contract ID:** `CBZCFFWQMIZZ7UNUB6PR7PS4IKRZ4S7BYWU3RCIJHA2S7ATK4SC2BG2N`
+- **Explorer template:** `https://stellar.expert/explorer/testnet/tx/979b7440a4e2ca1d89234100511089885fcf07e0aec70c9620b22c80e90ef8dc`
 
 ## Future Scope
+- **Off-chain identity binding**: Pair each wallet address with verified
+  real-world identity (e.g. via Freighter + a KYC oracle) so hospitals can
+  trust that an on-chain pledge maps to a real person.
+- **Hospital-side registry views**: Add authorized-hospital roles and a
+  bulk `list_pledges` view, so transplant coordinators can pull the full
+  active-pledge registry for a region.
+- **Time-locked and beneficiary pledges**: Support specifying a beneficiary
+  (e.g. a family member with a matching condition) and time-locked pledges
+  that only become effective after a confirm-by date.
+- **Cross-chain mirroring**: Mirror the registry state to other chains
+  (e.g. via a simple bridge) so global hospitals can verify pledges without
+  running a Stellar node.
+- **Privacy layer**: Encrypt the organ list and witness identity at rest,
+  with a hospital-side decryption key, so the public ledger does not leak
+  sensitive medical data.
+- **Frontend dApp**: A small web frontend (Freighter + Stellar SDK) that
+  walks a pledger through pledging, viewing, and revoking, and a hospital
+  dashboard for registry lookups.
 
-### Short-Term Enhancements
+## Profile
 
-1. **Note Encryption**: Support for end-to-end encryption of note content for enhanced privacy
-2. **Category Management**: Add tags and categories to organize notes efficiently
-3. **Rich Text Support**: Extend support beyond plain text to include Markdown and formatted content
-4. **Search Functionality**: Implement advanced search filters for large note collections
-
-### Medium-Term Development
-
-5. **Collaborative Notes**: Implement multi-signature requirements for shared or collaborative note-taking
-   - Shared access for multiple addresses
-   - Permission-based editing and viewing
-   - Version history tracking
-6. **Notification System**: Off-chain bridge to alert users of new updates or shared notes
-7. **Asset Attachment**: Capability to attach digital assets or tokens to specific notes
-8. **Inter-Contract Integration**: Allow other smart contracts to interact with and store data in the notes contract
-
-### Long-Term Vision
-
-9. **Cross-Chain Synchronization**: Extend note storage to multiple blockchain networks
-10. **Decentralized UI Hosting**: Host the frontend on IPFS or similar decentralized platforms
-11. **AI-Powered Summarization**: Optional integration with AI to help users summarize their notes
-12. **Privacy Layers**: Implement zero-knowledge proofs for completely private note content
-13. **DAO Governance**: Community-driven protocol improvements and feature prioritization
-14. **Identity Management**: Integration with decentralized identity (DID) systems for user management
-
-### Enterprise Features
-
-15. **Corporate Documentation**: Adapt the system for secure corporate record-keeping
-16. **Immutable Logging**: Create time-locked logs for audit purposes
-17. **Automated Reporting**: Automatic note triggers for periodic reporting
-18. **Multi-Language Support**: Expand accessibility with internationalization
-
----
-
-## Technical Requirements
-
-- Soroban SDK
-- Rust programming language
-- Stellar blockchain network
-
-## Getting Started
-
-Deploy the smart contract to Stellar's Soroban network and interact with it using the three main functions:
-
-- `create_note()` - Create a new note with a title and content
-- `get_notes()` - Retrieve all stored notes from the contract
-- `delete_note()` - Remove a specific note by its ID
-
----
-
-**Stellar Notes DApp** - Securing Your Thoughts on the Blockchain
+- **Name:** <!-- Fill github name -->
+- **Project:** `organ_pledge` (healthcare)
+- **Built with:** Soroban SDK 25, Rust, Stellar Testnet
